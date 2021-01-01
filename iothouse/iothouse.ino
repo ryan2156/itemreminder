@@ -1,5 +1,4 @@
 #include <WiFiEsp.h>
-#include <Servo.h>
 
 #define LAN_SSID "qqneinei"
 #define LAN_PASS "123456789"
@@ -8,10 +7,10 @@ WiFiEspServer server(80);
 int status = WL_IDLE_STATUS;     // the Wifi radio's status
 RingBuffer buf(32);
 char cmd[32];
-Servo myServo;
+
 
 int ledPin = 13;
-int servoPin = 8;
+
 
 int led1 = 9;
 int led2 = 7;
@@ -25,7 +24,6 @@ int index;
 
 void setup() {
   pinMode(ledPin, OUTPUT);
-  myServo.attach(servoPin);
   Serial.begin(9600);
   Serial1.begin(9600);
   InitWiFi();
@@ -68,27 +66,53 @@ void loop() {
 
 void execCmd(WiFiEspClient client)
 {
-  Serial.println(cmd);
+  int keystatus1 = digitalRead(key1);
+  int keystatus2 = digitalRead(key2);
+  int keystatus3 = digitalRead(key3);
+  Serial.println(keystatus1);
+  Serial.println(keystatus1);
+  Serial.println(keystatus1);
+  Serial.println();
   
   while(cmd[index]!='@')
     index++;
   while(cmd[index]!=';')
   {
-    if(cmd[index]=='A')
+    if(keystatus1 == 0)
     {
-      turnOnLed(13);
+      turnOnLed(9);
       return;
     }
-    else if(cmd[index]=='B')
+    else if(keystatus1 == 1)
     {
-      turnOffLed(13);
+      turnOffLed(9);
+      return;
+    }
+    if(keystatus2 == 0)
+    {
+      turnOnLed(7);
+      return;
+    }
+    else if(keystatus2 == 1)
+    {
+      turnOffLed(7);
+      return;
+    }
+    if(keystatus3 == 0)
+    {
+      turnOnLed(6);
+      return;
+    }
+    else if(keystatus1 == 1)
+    {
+      turnOffLed(6);
       return;
     }
     else if(cmd[index]=='C')
     {
       int v = getInt(cmd, index+1);
       Serial.println(v);
-      myServo.write(v%181);
+      
     }
     index++;
     delay(10);
@@ -96,10 +120,7 @@ void execCmd(WiFiEspClient client)
   Serial.println("Job done");
 }
 
-void turnOnLed(int ledpin)
-{
-  digitalWrite(ledpin, HIGH);  
-}
+
 
 void turnOffLed(int ledpin)
 {
@@ -151,26 +172,3 @@ void printWifiStatus()
   Serial.print("IP Address of This AP: ");
   Serial.println(ip);
  }
-/*
-int key1 = 2;
-int led1 = 13;
-
-void light1() {
-  pinMode(key1, INPUT);
-  pinMode(led1, OUTPUT);
-  Serial.begin(9600);
-}
-
-void loop() {
-  int keystate = digitalRead(key1);
-  if(keystate == 0)
-  {
-    digitalWrite(led1, LOW);
-  }
-  else
-  {
-    digitalWrite(led1, HIGH);
-  }
-  Serial.print(keystate);
-  delay(500);
-*/
